@@ -20,7 +20,7 @@ client.connect()
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get('/', (res) => {
+app.get('/', (req, res) => {
   res.send('Приветствую, сервер работает в штатном режиме!');
 });
 
