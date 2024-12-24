@@ -110,6 +110,27 @@ app.delete('/delclients_id', async (req, res) => {
     }
 });
 
+
+// Получение списка всех стран
+
+app.get('/getcountries', async (req, res) => {
+  try {
+      const result = await client.query('SELECT * FROM countries');
+      res.status(200).json(result.rows);
+  } catch (error) {
+      console.error('Ошибка при получении стран:', error);
+      res.status(500).json({ error: 'Ошибка при получении стран' });
+  }
+});
+
+
+
+
+
+
+
+
+
 // Структура создания HTTP подключения
 http.createServer((req, res) => {
   res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
