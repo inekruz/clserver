@@ -142,7 +142,7 @@ app.delete('/deletecountry', async (req, res) => {
 
 
 // Обновление данных о стране
-app.put('updatecountry', async (req, res) => {
+app.put('/updatecountry', async (req, res) => {
   const { id, country_name, country_code, description } = req.body;
   try {
       const result = await client.query(
