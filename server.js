@@ -49,7 +49,7 @@ app.post('/addclient', async (req, res) => {
       console.error('Ошибка при добавлении клиента:', error);
       res.status(500).json({ error: 'Ошибка при добавлении клиента' });
     }
-  });
+});
 
 // Получение списка всех клиентов
 app.get('/getclients', async (req, res) => {
@@ -111,8 +111,9 @@ app.delete('/delclients_id', async (req, res) => {
 });
 
 
-// Получение списка всех стран
+// ================= CRUD для стран ================= //
 
+// Получение списка всех стран
 app.get('/getcountries', async (req, res) => {
   try {
       const result = await client.query('SELECT * FROM countries');
@@ -124,8 +125,55 @@ app.get('/getcountries', async (req, res) => {
 });
 
 
+// Удаление страны
+app.delete('/deletecountry', async (req, res) => {
+  const { id } = req.body;
+  try {
+    const result = await client.query('DELETE FROM Countries WHERE country_id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Страна не найдена' });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error('Ошибка при удалении страны:', error);
+    res.status(500).json({ error: 'Ошибка при удалении страны' });
+  }
+});
 
 
+// Обновление данных о стране
+app.put('updatecountry', async (req, res) => {
+  const { id, country_name, country_code, description } = req.body;
+  try {
+      const result = await client.query(
+      'UPDATE Countries SET country_name = $2, country_code = $3, description = $4, updated_at = CURRENT_TIMESTAMP WHERE country_id = $1 RETURNING *',
+      [id, country_name, country_code, description]
+      );
+      if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Страна не найдена' });
+      }
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error('Ошибка при обновлении страны:', error);
+      res.status(500).json({ error: 'Ошибка при обновлении страны' });
+  }
+});
+
+
+// Добавление страны
+app.post('/addcountry', async (req, res) => {
+  const { country_name, country_code, description } = req.body;
+  try {
+    const result = await client.query(
+      'INSERT INTO Countries (country_name, country_code, description) VALUES ($1, $2, $3) RETURNING *',
+      [country_name, country_code, description]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Ошибка при добавлении клиента:', error);
+    res.status(500).json({ error: 'Ошибка при добавлении клиента' });
+  }
+});
 
 
 
