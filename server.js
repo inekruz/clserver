@@ -78,7 +78,7 @@ app.get('/getclient_id', async (req, res) => {
   });
 
 // Обновление клиента
-app.put('updclient_id', async (req, res) => {
+app.put('/updclient_id', async (req, res) => {
     const { id, first_name, last_name, email, phone, birth_date } = req.body;
     try {
         const result = await client.query(
