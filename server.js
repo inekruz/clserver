@@ -175,9 +175,81 @@ app.post('/addcountry', async (req, res) => {
   }
 });
 
+//=======CRUD TOURS=======
 
+// Добавление тура
+app.post('/addtour', async (req, res) => {
+  const { tour_name, country_id, price, duration, description, start_date, end_date } = req.body;
+  try {
+      const result = await client.query(
+          'INSERT INTO Tours (tour_name, country_id, price, duration, description, start_date, end_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+          [tour_name, country_id, price, duration, description, start_date, end_date]
+      );
+      res.status(201).json(result.rows[0]);
+  } catch (error) {
+      console.error('Ошибка при добавлении тура:', error);
+      res.status(500).json({ error: 'Ошибка при добавлении тура' });
+  }
+});
 
+// Получение списка всех туров
+app.get('/gettours', async (req, res) => {
+  try {
+      const result = await client.query('SELECT * FROM Tours');
+      res.status(200).json(result.rows);
+  } catch (error) {
+      console.error('Ошибка при получении туров:', error);
+      res.status(500).json({ error: 'Ошибка при получении туров' });
+  }
+});
 
+// Получение тура по ID
+app.get('/gettour_id', async (req, res) => {
+  const { id } = req.body;
+  try {
+      const result = await client.query('SELECT * FROM Tours WHERE tour_id = $1', [id]);
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Тур не найден' });
+      }
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error('Ошибка при получении тура:', error);
+      res.status(500).json({ error: 'Ошибка при получении тура' });
+  }
+});
+
+// Обновление тура
+app.put('/uptour_id', async (req, res) => {
+  const { id, tour_name, country_id, price, duration, description, start_date, end_date } = req.body;
+  try {
+      const result = await client.query(
+          'UPDATE Tours SET tour_name = $1, country_id = $2, price = $3, duration = $4, description = $5, start_date = $6, end_date = $7, updated_at = CURRENT_TIMESTAMP WHERE tour_id = $8 RETURNING *',
+          [tour_name, country_id, price, duration, description, start_date, end_date, id]
+      );
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Тур не найден' });
+      }
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error('Ошибка при обновлении тура:', error);
+      res.status(500).json({ error: 'Ошибка при обновлении тура' });
+  }
+});
+
+// Удаление тура
+app.delete('/deltour_id', async (req, res) => {
+  const { id } = req.body;
+  try {
+      const result = await client.query('DELETE FROM Tours WHERE tour_id = $1 RETURNING *', [id]);
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Тур не найден' });
+      }
+      res.status(204).send();
+  } catch (error) {
+      console.error('Ошибка при удалении тура:', error);
+      res.status(500).json({ error: 'Ошибка при удалении тура' });
+  }
+});
 
 // Структура создания HTTP подключения
 http.createServer((req, res) => {
